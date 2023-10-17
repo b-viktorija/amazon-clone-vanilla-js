@@ -41,7 +41,7 @@ function fetchProducts() {
               </div>
     
               <div class="product-quantity-container">
-                <select>
+                <select class="js-quantity-selector-${product.id}">
                   <option selected value="1">1</option>
                   <option value="2">2</option>
                   <option value="3">3</option>
@@ -57,13 +57,13 @@ function fetchProducts() {
     
               <div class="product-spacer"></div>
     
-              <div class="added-to-cart">
+              <div class="added-to-cart js-added-to-cart-${product.id}">
                 <img src="images/icons/checkmark.png">
                 Added
               </div>
     
               <button class="add-to-cart-button button-primary js-add-to-cart"
-              data-product-id = "${product.id}" >
+              data-product-id =${product.id} >
                 Add to Cart
               </button>
             </div>
@@ -84,8 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("click", (event) => {
     if (event.target.matches(".js-add-to-cart")) {
       const button = event.target
-      const productId = button.dataset.productId
-
+      const { productId } = button.dataset
       //update the cart quantity
       // create an empty variable out of the for each loop to later store the matching variable inside it.
       let matchingItem
@@ -95,16 +94,32 @@ document.addEventListener("DOMContentLoaded", () => {
           matchingItem = item
         }
       })
+
+      // ensure we are getting the correct item and the correct quantity selected;
+      const quantitySelector = document.querySelector(
+        `.js-quantity-selector-${productId}`
+      )
+      const quantity = quantitySelector.value
+
       // if we found a matching item, it's an object which is a truthy value that's why we are just writing that. It means, if matching item exists;
       if (matchingItem) {
-        matchingItem.quantity += 1
+        matchingItem.quantity += Number(quantity)
       } else {
         // we are using window.cart.push to add to the cart when a product is not already in it;
-        window.cart.push({
-          productId: productId,
-          quantity: 1,
+        cart.push({
+          productId,
+          quantity: Number(quantity),
         })
       }
+
+      // makes the added to cart appear ;
+      const addedMessage = document.querySelector(
+        `.js-added-to-cart-${productId}`
+      )
+      addedMessage.classList.add("added")
+      setTimeout(() => {
+        addedMessage.classList.remove("added")
+      }, 1500)
     }
     // Calculate total cart quantity
 
